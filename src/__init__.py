@@ -1,133 +1,114 @@
 """
 Modern Tkinter UI Library
-A Pythonic, declarative UI library built on top of Tkinter
+
+A modern, CSS-inspired styling system for Tkinter applications.
+Provides declarative styling, theming, and enhanced widgets.
 """
 
-import tkinter as tk
-from typing import Dict, Any, Optional
+__version__ = "0.1.0"
 
-# Core components
-from src.core.style_engine import StyleEngine
-from src.core.theme_manager import ThemeManager
-from src.core.style_resolver import StyleResolver
+# Core imports
+from .core.theme_manager import ThemeManager
+from .core.style_engine import StyleEngine
 
-# Widgets
+# Widget imports
 from .widgets.button import Button
+from .widgets.frame import Frame
+from .widgets.label import Label
+from .widgets.entry import Entry
+from .widgets.text import Text
+from .widgets.checkbox import Checkbox
+from .widgets.radiobutton import RadioButton
+from .widgets.progressbar import ProgressBar
 
-# Global instances
-_style_engine = StyleEngine()
-_theme_manager = ThemeManager()
-_style_resolver = StyleResolver(_theme_manager)
+# Layout imports
+from .layout.containers import Container
+from .layout.flex import FlexLayout
+from .layout.grid import ResponsiveGrid
 
-# Inject dependencies
-_style_engine.theme_manager = _theme_manager
+# Theme imports
+from .themes import default_theme, dark_theme, material_theme, fluent_theme
+
+# Utility classes
+from .utils.colors import Color
+from .utils.fonts import FontManager
+
+# Main application class
+import tkinter as tk
+from typing import Optional, Dict, Any
 
 class App:
-    """Main application class - simplified Tkinter app with theme support"""
+    """Main application class with theme support"""
     
-    def __init__(self, title="Modern Tkinter App", size=(800, 600), 
-                 theme="default", **kwargs):
+    def __init__(self, theme: str = "default", **kwargs):
         self.root = tk.Tk()
-        self.root.title(title)
-        self.root.geometry(f"{size[0]}x{size[1]}")
+        self.theme_manager = ThemeManager()
+        self.style_engine = StyleEngine(self.theme_manager)
         
-        # Apply theme
-        Theme.use(theme)
+        # Set theme
+        if theme == "default":
+            self.theme_manager.set_theme(default_theme)
+        elif theme == "dark":
+            self.theme_manager.set_theme(dark_theme)
+        elif theme == "material":
+            self.theme_manager.set_theme(material_theme)
+        elif theme == "fluent":
+            self.theme_manager.set_theme(fluent_theme)
         
-        # Configure root styling
-        if theme == 'dark':
-            self.root.config(bg='#212529')
-        else:
-            self.root.config(bg='#FFFFFF')
-        
-        # Apply any additional kwargs to root
-        if kwargs:
-            self.root.config(**kwargs)
+        # Configure root window
+        for key, value in kwargs.items():
+            if hasattr(self.root, key):
+                setattr(self.root, key, value)
     
     def run(self):
         """Start the application main loop"""
         self.root.mainloop()
     
-    def quit(self):
-        """Quit the application"""
-        self.root.quit()
+    def __getattr__(self, name):
+        """Delegate to root window"""
+        return getattr(self.root, name)
+
+# Style class decorator
+def StyleClass(cls):
+    """Decorator to create reusable style classes"""
+    cls._is_style_class = True
+    return cls
+
+# Global theme manager instance
+_global_theme_manager = ThemeManager()
 
 class Theme:
-    """Static interface for theme management"""
-    
-    @staticmethod
-    def use(theme_name: str):
-        """Switch to a specific theme"""
-        _theme_manager.use(theme_name)
+    """Global theme management interface"""
     
     @staticmethod
     def register(name: str, theme_dict: Dict[str, Any]):
         """Register a new theme"""
-        _theme_manager.register_theme(name, theme_dict)
+        _global_theme_manager.register_theme(name, theme_dict)
     
     @staticmethod
-    def current() -> Optional[str]:
-        """Get current theme name"""
-        return _theme_manager.current_theme
+    def use(name: str):
+        """Set the active theme"""
+        _global_theme_manager.use_theme(name)
     
     @staticmethod
-    def available() -> list:
-        """Get list of available themes"""
-        return _theme_manager.get_available_themes()
-    
-    @staticmethod
-    def export(theme_name: str, filepath: str):
-        """Export theme to file"""
-        _theme_manager.export_theme(theme_name, filepath)
-    
-    @staticmethod
-    def import_theme(filepath: str, name: str = None) -> str:
-        """Import theme from file"""
-        return _theme_manager.import_theme(filepath, name)
+    def get(key: str):
+        """Get a theme value"""
+        return _global_theme_manager.get_theme_value(key)
 
-class StyleClass:
-    """Decorator for creating reusable style classes"""
-    
-    def __init__(self, cls):
-        self.cls = cls
-        self._style_dict = None
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert style class to dictionary"""
-        if self._style_dict is None:
-            self._style_dict = {}
-            for attr in dir(self.cls):
-                if not attr.startswith('_'):
-                    value = getattr(self.cls, attr)
-                    if not callable(value):
-                        self._style_dict[attr] = value
-        return self._style_dict.copy()
-
-# Inject global dependencies into widgets
-def _inject_dependencies():
-    """Inject global dependencies into all widgets"""
-    from .core.base_widget import BaseWidget
-    
-    # Patch BaseWidget to include global dependencies
-    original_init = BaseWidget.__init__
-    
-    def patched_init(self, *args, **kwargs):
-        original_init(self, *args, **kwargs)
-        self.style_engine = _style_engine
-        self.theme_manager = _theme_manager
-        
-        # Re-apply styles with dependencies
-        if hasattr(self, '_apply_all_styles'):
-            self._apply_all_styles()
-    
-    BaseWidget.__init__ = patched_init
-
-# Apply dependency injection
-_inject_dependencies()
-
-# Public API exports
 __all__ = [
+    # Core classes
     'App', 'Theme', 'StyleClass',
-    'Button', 
-    # Add more widgets as they're implemented
+    
+    # Widgets
+    'Button', 'Frame', 'Label', 'Entry', 'Text',
+    'Checkbox', 'RadioButton', 'ProgressBar',
+    
+    # Layouts
+    'Container', 'FlexLayout', 'ResponsiveGrid',
+    
+    # Themes
+    'default_theme', 'dark_theme', 'material_theme', 'fluent_theme',
+    
+    # Utils
+    'Color', 'FontManager'
 ]

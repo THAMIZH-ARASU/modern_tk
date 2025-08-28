@@ -1,234 +1,240 @@
 """
-Core Style Engine - Translates Pythonic style definitions to Tkinter configurations
+Core style processing engine for Modern TK.
+Handles style parsing, validation, and application to widgets.
 """
 
 import tkinter as tk
 from typing import Dict, Any, Optional, Union
-from abc import ABC, abstractmethod
-import re
-
-class StyleProperty:
-    """Represents a style property with validation and processing logic"""
-    
-    def __init__(self, tk_option: str = None, processor=None, validator=None):
-        self.tk_option = tk_option
-        self.processor = processor or (lambda x: x)
-        self.validator = validator or (lambda x: True)
-    
-    def process(self, value: Any) -> Any:
-        if not self.validator(value):
-            raise ValueError(f"Invalid value for style property: {value}")
-        return self.processor(value)
+from ..utils.colors import Color
+from ..utils.validators import StyleValidator
+from ..effects.shadows import ShadowEffect
+from ..effects.borders import BorderEffect
+from ..effects.gradients import GradientEffect
 
 class StyleEngine:
-    """Core engine for processing and applying styles to widgets"""
+    """Central style processing and application engine"""
     
-    def __init__(self):
-        self.properties = self._init_style_properties()
-        self.theme_manager = None  # Will be injected
-        self.special_processors = {
-            'radius': self._process_radius,
-            'shadow': self._process_shadow,
-            'gradient': self._process_gradient,
-            'hover_bg': self._process_hover_state,
-            'focus_bg': self._process_focus_state,
-        }
+    def __init__(self, theme_manager=None):
+        self.theme_manager = theme_manager
+        self.validator = StyleValidator()
+        self.style_cache = {}
+        
+        # Effect processors
+        self.shadow_effect = ShadowEffect()
+        self.border_effect = BorderEffect()
+        self.gradient_effect = GradientEffect()
     
-    def _init_style_properties(self) -> Dict[str, StyleProperty]:
-        """Initialize mapping of style properties to Tkinter options"""
-        return {
-            # Basic properties
-            'bg': StyleProperty('bg', self._process_color),
-            'background': StyleProperty('bg', self._process_color),
-            'fg': StyleProperty('fg', self._process_color),
-            'foreground': StyleProperty('fg', self._process_color),
-            'font': StyleProperty('font', self._process_font),
-            'width': StyleProperty('width', int),
-            'height': StyleProperty('height', int),
-            'relief': StyleProperty('relief'),
-            'borderwidth': StyleProperty('borderwidth', int),
-            'bd': StyleProperty('bd', int),
+    def parse_style_dict(self, style_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """Parse and normalize a style dictionary"""
+        if not style_dict:
+            return {}
+        
+        parsed = {}
+        
+        for key, value in style_dict.items():
+            # Normalize property names
+            normalized_key = self._normalize_property_name(key)
             
-            # Padding and margins (custom processing)
-            'padding': StyleProperty(processor=self._process_padding),
-            'margin': StyleProperty(processor=self._process_margin),
+            # Parse value based on property type
+            parsed_value = self._parse_property_value(normalized_key, value)
             
-            # Text properties
-            'text_align': StyleProperty('justify'),
-            'text_wrap': StyleProperty('wraplength', int),
-            
-            # State properties (require special handling)
-            'hover_bg': StyleProperty(processor=lambda x: x),
-            'hover_fg': StyleProperty(processor=lambda x: x),
-            'focus_bg': StyleProperty(processor=lambda x: x),
-            'active_bg': StyleProperty('activebackground', self._process_color),
-            'active_fg': StyleProperty('activeforeground', self._process_color),
-            
-            # Custom properties (processed separately)
-            'radius': StyleProperty(processor=lambda x: max(0, int(x))),
-            'shadow': StyleProperty(processor=self._process_shadow_config),
-            'gradient': StyleProperty(processor=self._process_gradient_config),
-        }
+            if parsed_value is not None:
+                parsed[normalized_key] = parsed_value
+        
+        return parsed
     
-    def apply_style(self, widget, style_dict: Dict[str, Any]) -> None:
-        """Apply style dictionary to a widget"""
+    def apply_to_widget(self, widget, style_dict: Dict[str, Any]):
+        """Apply parsed style to a widget"""
         if not style_dict:
             return
         
-        # Separate standard and special properties
-        standard_props = {}
-        special_props = {}
+        tk_widget = getattr(widget, 'tk_widget', widget)
         
-        for key, value in style_dict.items():
-            if key in self.special_processors:
-                special_props[key] = value
-            elif key in self.properties:
-                prop = self.properties[key]
-                if prop.tk_option:  # Standard Tkinter property
-                    try:
-                        processed_value = prop.process(value)
-                        standard_props[prop.tk_option] = processed_value
-                    except (ValueError, TypeError) as e:
-                        print(f"Warning: Invalid value for {key}: {value} ({e})")
+        # Apply basic properties
+        self._apply_basic_properties(tk_widget, style_dict)
         
-        # Apply standard properties
-        if standard_props:
-            widget.config(**standard_props)
-        
-        # Process special properties
-        for key, value in special_props.items():
-            if key in self.special_processors:
-                self.special_processors[key](widget, value)
+        # Apply special effects
+        self._apply_special_effects(widget, style_dict)
     
-    def _process_color(self, color: Union[str, tuple]) -> str:
-        """Process color values - supports hex, rgb tuples, or color names"""
+    def validate_style(self, style_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate style properties and values"""
+        return self.validator.validate(style_dict)
+    
+    def cascade_styles(self, *style_dicts) -> Dict[str, Any]:
+        """Merge multiple style dictionaries with proper cascading"""
+        result = {}
+        
+        for style_dict in style_dicts:
+            if style_dict:
+                result.update(style_dict)
+        
+        return result
+    
+    def _normalize_property_name(self, prop: str) -> str:
+        """Normalize property names (e.g., backgroundColor -> bg)"""
+        # CSS-style to Tkinter mapping
+        mappings = {
+            'backgroundColor': 'bg',
+            'foregroundColor': 'fg',
+            'textColor': 'fg',
+            'fontFamily': 'font_family',
+            'fontSize': 'font_size',
+            'fontWeight': 'font_weight',
+            'borderRadius': 'radius',
+            'borderWidth': 'border_width',
+            'borderColor': 'border_color',
+            'boxShadow': 'shadow',
+            'paddingTop': 'pady',
+            'paddingLeft': 'padx',
+            'marginTop': 'margin_y',
+            'marginLeft': 'margin_x',
+        }
+        
+        return mappings.get(prop, prop)
+    
+    def _parse_property_value(self, prop: str, value: Any) -> Any:
+        """Parse property value based on its type"""
+        if prop in ['bg', 'fg', 'border_color', 'hover_bg', 'hover_fg']:
+            return self._parse_color(value)
+        elif prop in ['font_size', 'border_width', 'radius']:
+            return self._parse_number(value)
+        elif prop == 'font':
+            return self._parse_font(value)
+        elif prop == 'padding':
+            return self._parse_spacing(value)
+        elif prop == 'shadow':
+            return self._parse_shadow(value)
+        else:
+            return value
+    
+    def _parse_color(self, color: Union[str, tuple]) -> str:
+        """Parse color value"""
         if isinstance(color, str):
-            # Handle theme color references
-            if hasattr(self.theme_manager, 'resolve_color'):
-                return self.theme_manager.resolve_color(color)
+            # Handle theme references
+            if self.theme_manager and color.startswith('@'):
+                theme_key = color[1:]
+                return self.theme_manager.get_theme_value(f"colors.{theme_key}")
             return color
         elif isinstance(color, tuple) and len(color) == 3:
-            # Convert RGB tuple to hex
-            r, g, b = [max(0, min(255, int(c))) for c in color]
-            return f'#{r:02x}{g:02x}{b:02x}'
-        else:
-            raise ValueError(f"Invalid color format: {color}")
+            return f"#{color[0]:02x}{color[1]:02x}{color[2]:02x}"
+        return str(color)
     
-    def _process_font(self, font: Union[str, tuple]) -> tuple:
-        """Process font specifications"""
+    def _parse_number(self, value: Union[int, float, str]) -> Union[int, float]:
+        """Parse numeric value"""
+        if isinstance(value, (int, float)):
+            return value
+        elif isinstance(value, str):
+            try:
+                if '.' in value:
+                    return float(value)
+                else:
+                    return int(value)
+            except ValueError:
+                return 0
+        return 0
+    
+    def _parse_font(self, font: Union[str, tuple, list]) -> tuple:
+        """Parse font specification"""
         if isinstance(font, str):
-            return (font, 10)
-        elif isinstance(font, tuple):
-            return font
-        else:
-            raise ValueError(f"Invalid font format: {font}")
+            return (font, 10, 'normal')
+        elif isinstance(font, (tuple, list)):
+            if len(font) >= 3:
+                return tuple(font[:3])
+            elif len(font) == 2:
+                return (font[0], font[1], 'normal')
+            elif len(font) == 1:
+                return (font[0], 10, 'normal')
+        return ('TkDefaultFont', 10, 'normal')
     
-    def _process_padding(self, padding: Union[int, tuple]) -> Dict[str, int]:
-        """Process padding values (similar to CSS)"""
-        if isinstance(padding, int):
-            return {'padx': padding, 'pady': padding}
-        elif isinstance(padding, tuple):
-            if len(padding) == 2:
-                return {'padx': padding[0], 'pady': padding[1]}
-            elif len(padding) == 4:
-                # top, right, bottom, left -> padx, pady
-                return {'padx': padding[1], 'pady': padding[0]}
+    def _parse_spacing(self, value: Union[int, tuple, list]) -> tuple:
+        """Parse padding/margin values"""
+        if isinstance(value, int):
+            return (value, value)
+        elif isinstance(value, (tuple, list)):
+            if len(value) >= 2:
+                return (value[0], value[1])
+            elif len(value) == 1:
+                return (value[0], value[0])
+        return (0, 0)
+    
+    def _parse_shadow(self, shadow: Union[bool, dict]) -> dict:
+        """Parse shadow specification"""
+        if isinstance(shadow, bool):
+            return {'enabled': shadow} if shadow else {}
+        elif isinstance(shadow, dict):
+            return shadow
         return {}
     
-    def _process_margin(self, margin: Union[int, tuple]) -> Dict[str, int]:
-        """Process margin values"""
-        # Similar to padding but for external spacing
-        return self._process_padding(margin)
-    
-    def _process_shadow_config(self, shadow_config: Union[bool, dict]) -> dict:
-        """Process shadow configuration"""
-        if isinstance(shadow_config, bool):
-            return {'enabled': shadow_config, 'color': '#888888', 'offset': (2, 2), 'blur': 4}
-        elif isinstance(shadow_config, dict):
-            defaults = {'enabled': True, 'color': '#888888', 'offset': (2, 2), 'blur': 4}
-            defaults.update(shadow_config)
-            return defaults
-        return {'enabled': False}
-    
-    def _process_gradient_config(self, gradient_config: Union[list, dict]) -> dict:
-        """Process gradient configuration"""
-        if isinstance(gradient_config, list) and len(gradient_config) >= 2:
-            return {'colors': gradient_config, 'direction': 'vertical'}
-        elif isinstance(gradient_config, dict):
-            return gradient_config
-        return {'enabled': False}
-    
-    # Special property processors
-    def _process_radius(self, widget, radius: int):
-        """Apply border radius effect (requires custom canvas overlay)"""
-        # Store radius for custom rendering
-        if not hasattr(widget, '_modern_tk_effects'):
-            widget._modern_tk_effects = {}
-        widget._modern_tk_effects['radius'] = radius
+    def _apply_basic_properties(self, tk_widget, style_dict: Dict[str, Any]):
+        """Apply basic Tkinter properties"""
+        # Color properties
+        if 'bg' in style_dict:
+            try:
+                tk_widget.configure(bg=style_dict['bg'])
+            except tk.TclError:
+                pass
         
-        # This would trigger custom border rendering
-        self._apply_rounded_corners(widget, radius)
+        if 'fg' in style_dict:
+            try:
+                tk_widget.configure(fg=style_dict['fg'])
+            except tk.TclError:
+                pass
+        
+        # Font properties
+        if any(key in style_dict for key in ['font', 'font_family', 'font_size', 'font_weight']):
+            font = self._build_font(style_dict)
+            try:
+                tk_widget.configure(font=font)
+            except tk.TclError:
+                pass
+        
+        # Border properties
+        if 'border_width' in style_dict:
+            try:
+                tk_widget.configure(bd=style_dict['border_width'])
+            except tk.TclError:
+                pass
+        
+        if 'border_color' in style_dict:
+            try:
+                tk_widget.configure(highlightbackground=style_dict['border_color'])
+            except tk.TclError:
+                pass
+        
+        # Padding
+        if 'padx' in style_dict:
+            try:
+                tk_widget.configure(padx=style_dict['padx'])
+            except tk.TclError:
+                pass
+        
+        if 'pady' in style_dict:
+            try:
+                tk_widget.configure(pady=style_dict['pady'])
+            except tk.TclError:
+                pass
     
-    def _process_shadow(self, widget, shadow_config: dict):
-        """Apply drop shadow effect"""
-        if not hasattr(widget, '_modern_tk_effects'):
-            widget._modern_tk_effects = {}
-        widget._modern_tk_effects['shadow'] = shadow_config
+    def _build_font(self, style_dict: Dict[str, Any]) -> tuple:
+        """Build font tuple from style properties"""
+        if 'font' in style_dict:
+            return style_dict['font']
         
-        if shadow_config.get('enabled', True):
-            self._apply_shadow_effect(widget, shadow_config)
+        family = style_dict.get('font_family', 'TkDefaultFont')
+        size = style_dict.get('font_size', 10)
+        weight = style_dict.get('font_weight', 'normal')
+        
+        return (family, size, weight)
     
-    def _process_gradient(self, widget, gradient_config: dict):
-        """Apply gradient background"""
-        if not hasattr(widget, '_modern_tk_effects'):
-            widget._modern_tk_effects = {}
-        widget._modern_tk_effects['gradient'] = gradient_config
+    def _apply_special_effects(self, widget, style_dict: Dict[str, Any]):
+        """Apply special visual effects"""
+        # Shadow effect
+        if 'shadow' in style_dict and style_dict['shadow']:
+            self.shadow_effect.apply(widget, style_dict['shadow'])
         
-        self._apply_gradient_background(widget, gradient_config)
-    
-    def _process_hover_state(self, widget, hover_bg: str):
-        """Setup hover state styling"""
-        original_bg = widget.cget('bg')
+        # Border radius
+        if 'radius' in style_dict and style_dict['radius'] > 0:
+            self.border_effect.apply_radius(widget, style_dict['radius'])
         
-        def on_enter(event):
-            widget.config(bg=self._process_color(hover_bg))
-        
-        def on_leave(event):
-            widget.config(bg=original_bg)
-        
-        widget.bind('<Enter>', on_enter)
-        widget.bind('<Leave>', on_leave)
-    
-    def _process_focus_state(self, widget, focus_bg: str):
-        """Setup focus state styling"""
-        original_bg = widget.cget('bg')
-        
-        def on_focus_in(event):
-            widget.config(bg=self._process_color(focus_bg))
-        
-        def on_focus_out(event):
-            widget.config(bg=original_bg)
-        
-        widget.bind('<FocusIn>', on_focus_in)
-        widget.bind('<FocusOut>', on_focus_out)
-    
-    def _apply_rounded_corners(self, widget, radius: int):
-        """Apply rounded corners using canvas overlay"""
-        # This is a simplified version - real implementation would be more complex
-        parent = widget.master
-        if parent:
-            # Create canvas overlay for rounded effect
-            canvas = tk.Canvas(parent, highlightthickness=0)
-            # Implementation would draw rounded rectangle
-            pass
-    
-    def _apply_shadow_effect(self, widget, shadow_config: dict):
-        """Apply drop shadow effect"""
-        # Implementation would create shadow canvas behind widget
-        pass
-    
-    def _apply_gradient_background(self, widget, gradient_config: dict):
-        """Apply gradient background using canvas"""
-        # Implementation would create gradient canvas
-        pass
-
+        # Gradient background
+        if 'gradient' in style_dict:
+            self.gradient_effect.apply(widget, style_dict['gradient'])
