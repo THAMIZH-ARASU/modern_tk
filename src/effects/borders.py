@@ -8,6 +8,7 @@ class BorderEffect:
     
     def __init__(self):
         self.border_widgets = {}
+        self.radius_widgets = {}
     
     def apply(self, widget, border_config: Union[bool, Dict[str, Any]]):
         """Apply border effect to a widget"""
@@ -26,6 +27,21 @@ class BorderEffect:
             config.update(border_config)
         
         self._create_border(widget, config)
+    
+    def apply_radius(self, widget, radius: int):
+        """Apply border radius effect to a widget"""
+        # For tkinter, border radius is simulated using a canvas
+        # This is a simplified implementation
+        
+        # Store radius reference
+        self.radius_widgets[widget] = radius
+        
+        # For a basic implementation, we'll just set a relief style
+        # A full implementation would use a canvas to create rounded corners
+        try:
+            widget.tk_widget.configure(relief='flat')
+        except:
+            pass
     
     def _create_border(self, widget, config: Dict[str, Any]):
         """Create border for widget"""
@@ -68,3 +84,6 @@ class BorderEffect:
             for border in self.border_widgets[widget]:
                 border.destroy()
             del self.border_widgets[widget]
+        
+        if widget in self.radius_widgets:
+            del self.radius_widgets[widget]
