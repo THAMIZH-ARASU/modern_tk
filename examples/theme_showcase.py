@@ -1,6 +1,13 @@
 """Theme showcase example"""
 
-from modern_tk import App, Button, Frame, Label, Theme
+import sys
+import os
+
+# Add the parent directory to the Python path so we can import src
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from src import App
+from src.widgets import Button, Entry, Frame, Label
 
 def create_theme_demo(parent, theme_name):
     """Create a demo section for a theme"""

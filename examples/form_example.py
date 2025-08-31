@@ -1,6 +1,14 @@
 """Modern form example with validation"""
 
-from modern_tk import App, Button, Frame, Label, Entry, Checkbox
+import sys
+import os
+
+# Add the parent directory to the Python path so we can import src
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from src import App
+from src.widgets import Button, Entry, Frame, Label, Checkbox
+import tkinter as tk
 
 class ModernForm:
     def __init__(self):
