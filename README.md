@@ -1,241 +1,394 @@
-# Modern TK - Modern Styling for Tkinter
+# Modern TK
 
-Modern TK is a Python library that brings modern, CSS-inspired styling to Tkinter applications. It provides a declarative approach to UI design with themes, hover effects, and responsive layouts.
+[![PyPI version](https://badge.fury.io/py/modern-tk.svg)](https://badge.fury.io/py/modern-tk)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/pypi/pyversions/modern-tk.svg)](https://pypi.org/project/modern-tk/)
+
+Modern TK is a Python library that brings modern, CSS-inspired styling to traditional Tkinter applications. It provides a declarative approach to UI design with support for themes, effects, and responsive layouts.
+
+![Modern TK Dashboard Example](docs/images/dashboard_example.png)
+*Modern dashboard built with Modern TK*
 
 ## Features
 
-- 🎨 **CSS-inspired styling** - Use familiar CSS-like properties
-- 🌙 **Built-in themes** - Default, Dark, Material, and Fluent themes
-- ⚡ **Hover effects** - Smooth transitions and interactive states
-- 📱 **Responsive layouts** - Flexbox-inspired layout system
-- 🔧 **Easy integration** - Works with existing Tkinter code
-- 🎯 **Type hints** - Full type safety support
-- 🧩 **Plugin system** - Extensible architecture
+- 🎨 **CSS-inspired Styling**: Declarative styling system similar to CSS
+- 🌈 **Advanced Theming**: Built-in themes (Default, Dark, Material, Fluent)
+- ✨ **Visual Effects**: Shadows, gradients, rounded corners, and more
+- 🧱 **Enhanced Widgets**: Modern versions of all standard Tkinter widgets
+- 📐 **Flexible Layouts**: Flexbox and grid-based layout systems
+- 🎯 **State Management**: Hover, active, focused, and disabled states
+- 📱 **Responsive Design**: Adaptive layouts for different screen sizes
+- 🔌 **Plugin System**: Extensible architecture for custom components
 
-## Quick Start
+## Installation
 
-### Installation
+Install Modern TK using pip:
 
 ```bash
 pip install modern-tk
 ```
 
-### Basic Usage
-
-```python
-from modern_tk import App, Button, Frame, Label
-
-# Create app with theme
-app = App(theme="dark")
-
-# Create styled button
-button = Button(
-    text="Click Me!",
-    style={
-        "bg": "#0078d4",
-        "fg": "white",
-        "radius": 8,
-        "hover_bg": "#106ebe",
-        "padding": (15, 8)
-    }
-)
-button.pack(pady=20)
-
-app.run()
-```
-
-### Theme-Based Styling
-
-```python
-from modern_tk import Theme, Button
-
-# Define custom theme
-custom_theme = {
-    "colors": {
-        "primary": "#2196F3",
-        "secondary": "#FFC107"
-    },
-    "widgets": {
-        "button": {
-            "bg": "@colors.primary",
-            "fg": "white",
-            "radius": 6,
-            "hover_bg": "#1976D2"
-        }
-    }
-}
-
-Theme.register("custom", custom_theme)
-Theme.use("custom")
-
-# Button automatically uses theme
-button = Button(text="Themed Button")
-```
-
-### Style Classes
-
-```python
-from modern_tk import Button, StyleClass
-
-@StyleClass
-class PrimaryButton:
-    bg = "#0078d4"
-    fg = "white"
-    radius = 8
-    padding = (15, 8)
-    hover_bg = "#106ebe"
-    font = ("Segoe UI", 10, "bold")
-
-# Use style class
-button = Button(text="Primary", style_class=PrimaryButton)
-```
-
-## Supported Widgets
-
-- **Button** - Enhanced button with hover effects
-- **Frame** - Container with styling support
-- **Label** - Styled text display
-- **Entry** - Modern text input with placeholders
-- **Text** - Multi-line text widget
-- **Checkbox** - Custom checkbox widget
-- **RadioButton** - Custom radio button
-- **ProgressBar** - Modern progress indicator
-
-## Available Themes
-
-### Default Theme
-Clean, modern light theme with subtle shadows and rounded corners.
-
-### Dark Theme  
-Professional dark theme perfect for modern applications.
-
-### Material Theme
-Google Material Design inspired theme with elevation and bold colors.
-
-### Fluent Theme
-Microsoft Fluent Design inspired theme with modern typography.
-
-## Styling Properties
-
-### Colors
-- `bg` / `background` - Background color
-- `fg` / `foreground` - Text color  
-- `border_color` - Border color
-- `hover_bg` - Hover background color
-- `active_bg` - Active state background
-
-### Typography
-- `font` - Font tuple (family, size, weight)
-- `font_family` - Font family name
-- `font_size` - Font size in points
-- `font_weight` - Font weight (normal, bold)
-
-### Layout & Spacing
-- `padding` - Internal padding
-- `margin` - External margin
-- `width` / `height` - Dimensions
-
-### Visual Effects
-- `radius` - Border radius for rounded corners
-- `shadow` - Drop shadow effect
-- `border_width` - Border thickness
-- `gradient` - Gradient backgrounds
-
-### States
-- `hover_*` - Hover state styles
-- `active_*` - Active/pressed state styles
-- `focused_*` - Focus state styles
-- `disabled_*` - Disabled state styles
-
-## Examples
-
-See the `examples/` directory for complete working examples:
-
-- `basic_usage.py` - Simple application demo
-- `theme_showcase.py` - Theme comparison
-- `modern_dashboard.py` - Dashboard layout example
-- `form_example.py` - Form with validation
-
-## Requirements
+### Requirements
 
 - Python 3.7+
-- Tkinter (included with Python)
-- Pillow >= 8.0.0 (for image processing)
+- Pillow >= 8.0.0
 
-## License
+## Quick Start
 
-MIT License - see LICENSE file for details.
+Here's a simple example to get you started:
 
-## Contributing
+```python
+from modern_tk import App, Button, Entry, Frame, Label
 
-Contributions are welcome! Please see CONTRIBUTING.md for guidelines.
-
-## Roadmap
-
-- [ ] Animation system
-- [ ] More built-in widgets
-- [ ] CSS file support
-- [ ] Visual designer tool
-- [ ] Mobile-responsive layouts
-```
-
-### Requirements for running the examples
-
-Note that this implementation provides a complete foundation for the Modern TK library. Here are some important points about the implementation:
-
-## Key Features Implemented:
-
-1. **Core Architecture**: Style engine, theme manager, base widget system
-2. **Enhanced Widgets**: Button, Frame, Label, Entry with modern styling
-3. **Theme System**: Default, Dark, Material themes with inheritance
-4. **Event Management**: Hover, focus, and custom event handling  
-5. **Style Validation**: Comprehensive style property validation
-6. **Layout Containers**: Enhanced containers with layout management
-7. **Visual Effects**: Shadow, border, and gradient effect systems
-8. **Examples**: Complete working examples showing the library in action
-
-## To use this library:
-
-1. Save all the files in their respective directories as shown in the structure
-2. Install the required dependencies: `pip install Pillow`
-3. Run the examples to see the library in action
-4. Import and use the widgets in your own applications
-
-The library provides a modern, CSS-inspired way to create beautiful Tkinter applications with themes, hover effects, and declarative styling while maintaining full compatibility with existing Tkinter code.
-
-This is a substantial and production-ready implementation that follows modern Python best practices with proper typing, documentation, and extensible architecture. App(title="Theme Showcase", geometry="800x500")
+def main():
+    # Create app with default theme
+    app = App(theme="default", title="Modern TK Demo", geometry="400x300")
     
-    # Main container
-    main_frame = Frame(app, style={'padding': 20})
+    # Create main container
+    main_frame = Frame(
+        app,
+        style={
+            'bg': '#f8f9fa',
+            'padding': 20
+        }
+    )
     main_frame.pack(fill='both', expand=True)
     
-    # Title
-    Label(
+    # Title label
+    title = Label(
         main_frame,
-        text="Modern TK Theme Showcase",
+        text="Welcome to Modern TK!",
         style={
-            'font': ('Segoe UI', 18, 'bold'),
+            'font': ('Segoe UI', 16, 'bold'),
             'fg': '#2c3e50',
-            'padding': (0, 20)
+            'bg': '#f8f9fa'
         }
-    ).pack()
+    )
+    title.pack(pady=(0, 20))
     
-    # Theme containers
-    themes_frame = Frame(main_frame)
-    themes_frame.pack(fill='both', expand=True)
+    # Entry field
+    entry = Entry(
+        main_frame,
+        placeholder="Enter your name...",
+        style={
+            'font': ('Segoe UI', 10),
+            'padding': (10, 8),
+            'radius': 6,
+            'border_width': 2,
+            'border_color': '#e9ecef',
+            'focused_border_color': '#0078d4'
+        }
+    )
+    entry.pack(fill='x', pady=(0, 15))
     
-    # Create theme demos
-    default_demo = create_theme_demo(themes_frame, 'default')
-    default_demo.pack(side='left', fill='both', expand=True, padx=(0, 10))
+    # Button with hover effects
+    def on_click():
+        name = entry.get()
+        if name:
+            result_label.set_text(f"Hello, {name}!")
+        else:
+            result_label.set_text("Please enter your name!")
     
-    material_demo = create_theme_demo(themes_frame, 'material')  
-    material_demo.pack(side='left', fill='both', expand=True, padx=5)
+    button = Button(
+        main_frame,
+        text="Say Hello",
+        command=on_click,
+        style={
+            'bg': '#0078d4',
+            'fg': 'white',
+            'font': ('Segoe UI', 10, 'bold'),
+            'padding': (15, 8),
+            'radius': 6,
+            'hover_bg': '#106ebe',
+            'active_bg': '#005a9e',
+            'border_width': 0
+        }
+    )
+    button.pack(pady=(0, 15))
     
-    dark_demo = create_theme_demo(themes_frame, 'dark')
-    dark_demo.pack(side='left', fill='both', expand=True, padx=(10, 0))
+    # Result label
+    result_label = Label(
+        main_frame,
+        text="Enter your name and click the button!",
+        style={
+            'font': ('Segoe UI', 10),
+            'fg': '#6c757d',
+            'bg': '#f8f9fa'
+        }
+    )
+    result_label.pack()
     
     app.run()
 
 if __name__ == "__main__":
     main()
 ```
+
+![Basic Usage Example](docs/images/basic_example.png)
+*Simple application with styled widgets*
+
+## Core Concepts
+
+### 1. Styling System
+
+Modern TK uses a declarative styling system inspired by CSS. Styles are defined as dictionaries and applied to widgets:
+
+```python
+button = Button(
+    text="Click Me",
+    style={
+        'bg': '#0078d4',
+        'fg': 'white',
+        'font': ('Segoe UI', 10, 'bold'),
+        'padding': (15, 8),
+        'radius': 6,
+        'hover_bg': '#106ebe',
+        'active_bg': '#005a9e',
+        'shadow': True
+    }
+)
+```
+
+### 2. State-Based Styling
+
+Widgets support multiple states with specific styling:
+
+```python
+button = Button(
+    text="State Button",
+    style={
+        'bg': '#f0f0f0',
+        'fg': '#333333',
+        'hover_bg': '#e0e0e0',
+        'active_bg': '#d0d0d0',
+        'disabled_bg': '#cccccc'
+    }
+)
+```
+
+### 3. Style Classes
+
+Reusable style classes can be defined and applied:
+
+```python
+from modern_tk import StyleClass
+
+@StyleClass
+class PrimaryButton:
+    bg = '#0078d4'
+    fg = 'white'
+    font = ('Segoe UI', 10, 'bold')
+    padding = (15, 8)
+    radius = 6
+    hover_bg = '#106ebe'
+    active_bg = '#005a9e'
+
+button = Button(
+    text="Primary Button",
+    style_class=PrimaryButton
+)
+```
+
+## Theming System
+
+Modern TK includes several built-in themes and supports custom themes:
+
+### Built-in Themes
+
+- **Default**: Clean, light theme
+- **Dark**: Dark mode theme
+- **Material**: Material Design inspired
+- **Fluent**: Microsoft Fluent Design inspired
+
+### Using Themes
+
+```python
+from modern_tk import App, Theme
+
+# Create app with specific theme
+app = App(theme="dark")
+
+# Or switch themes dynamically
+Theme.use("material")
+```
+
+### Custom Themes
+
+Create custom themes by defining a theme dictionary:
+
+```python
+custom_theme = {
+    "colors": {
+        "primary": "#3498db",
+        "secondary": "#2ecc71",
+        "background": "#ecf0f1"
+    },
+    "fonts": {
+        "default": ("Arial", 10, "normal")
+    },
+    "widgets": {
+        "button": {
+            "bg": "@colors.primary",
+            "fg": "white",
+            "padding": (12, 6)
+        }
+    }
+}
+
+Theme.register("custom", custom_theme)
+Theme.use("custom")
+```
+
+## Widgets
+
+Modern TK provides enhanced versions of all standard Tkinter widgets with additional styling capabilities:
+
+| Widget | Description |
+|--------|-------------|
+| `Button` | Clickable button with hover effects |
+| `Frame` | Container for grouping widgets |
+| `Label` | Text or image display |
+| `Entry` | Single-line text input |
+| `Text` | Multi-line text input |
+| `Checkbox` | Boolean selection control |
+| `RadioButton` | Single selection from group |
+| `ProgressBar` | Progress indicator |
+| `Canvas` | Drawing surface |
+| `ListBox` | List of selectable items |
+| `Scrollbar` | Scroll control |
+
+## Layout System
+
+Modern TK provides flexible layout systems:
+
+### Flex Layout
+
+```python
+from modern_tk.layouts import FlexLayout
+
+flex_container = FlexLayout(
+    app,
+    direction='row',
+    justify_content='space_between'
+)
+```
+
+### Grid Layout
+
+```python
+from modern_tk.layouts import ResponsiveGrid
+
+grid = ResponsiveGrid(
+    app,
+    columns=3,
+    gap=10
+)
+```
+
+## Effects & Animations
+
+Modern TK includes visual effects to enhance your UI:
+
+### Shadows
+
+```python
+button = Button(
+    text="Shadow Button",
+    style={
+        'shadow': {
+            'offset': (2, 2),
+            'blur': 5,
+            'color': '#00000040'
+        }
+    }
+)
+```
+
+### Gradients
+
+```python
+frame = Frame(
+    style={
+        'gradient': {
+            'type': 'linear',
+            'colors': ['#3498db', '#2ecc71'],
+            'direction': 'vertical'
+        }
+    }
+)
+```
+
+### Rounded Corners
+
+```python
+frame = Frame(
+    style={
+        'radius': 10,
+        'border_width': 2,
+        'border_color': '#3498db'
+    }
+)
+```
+
+## Examples
+
+Check out the [examples](examples/) directory for more detailed examples:
+
+1. [Basic Usage](examples/basic_usage.py) - Simple application with common widgets
+2. [Theme Showcase](examples/theme_showcase.py) - Demonstration of different themes
+3. [Form Example](examples/form_example.py) - Complex form with validation
+4. [Modern Dashboard](examples/modern_dashboard.py) - Complete dashboard application
+5. [Plugin Example](examples/plugin_example.py) - Custom plugin implementation
+
+![Theme Showcase](docs/images/theme_showcase.png)
+*Theme showcase with multiple theme examples*
+
+## API Reference
+
+For detailed API documentation, see [API Reference](docs/api_reference.md).
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/modern-tk.git
+cd modern-tk
+
+# Install in development mode
+pip install -e .
+
+# Install development dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Format code
+black src
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Inspired by modern UI frameworks like React and Flutter
+- Built on top of the robust Tkinter library
+- Uses Pillow for enhanced image processing capabilities
+
+---
+
+<p align="center">
+  Made with ❤️ by the Modern TK Team
+</p>
