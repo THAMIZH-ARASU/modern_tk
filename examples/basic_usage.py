@@ -1,8 +1,13 @@
 """Basic usage example for Modern TK"""
 
+import sys
+import os
+
+# Add the parent directory to the Python path so we can import src
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from src import App
-
+from src.widgets import Button, Entry, Frame, Label
 
 def main():
     # Create app with dark theme

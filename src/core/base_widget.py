@@ -80,7 +80,7 @@ class BaseWidget(ABC):
     
     def _apply_styles(self):
         """Apply current styles to the widget"""
-        from . import _global_theme_manager
+        from src import _global_theme_manager
         
         # Get style engine
         style_engine = StyleEngine(_global_theme_manager)
@@ -99,7 +99,7 @@ class BaseWidget(ABC):
         final_style.update(self.get_default_style())
         
         # 2. Theme style for this widget type
-        from . import _global_theme_manager
+        from src import _global_theme_manager
         widget_type = self.__class__.__name__.lower()
         theme_style = _global_theme_manager.get_widget_theme(widget_type)
         final_style.update(theme_style)

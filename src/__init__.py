@@ -20,8 +20,15 @@ from .widgets.text import Text
 from .widgets.checkbox import Checkbox
 from .widgets.radiobutton import RadioButton
 from .widgets.progressbar import ProgressBar
+from .widgets.canvas import Canvas
+from .widgets.listbox import ListBox
+from .widgets.scrollbar import Scrollbar
 
 # Layout imports
+from .layouts.containers import Container
+from .layouts.flex import FlexLayout
+from .layouts.grid import ResponsiveGrid
+from .layouts.responsive import ResponsiveManager
 
 # Theme imports
 from .themes import default_theme, dark_theme, material_theme, fluent_theme
@@ -99,9 +106,10 @@ __all__ = [
     # Widgets
     'Button', 'Frame', 'Label', 'Entry', 'Text',
     'Checkbox', 'RadioButton', 'ProgressBar',
+    'Canvas', 'ListBox', 'Scrollbar',
     
     # Layouts
-    'Container', 'FlexLayout', 'ResponsiveGrid',
+    'Container', 'FlexLayout', 'ResponsiveGrid', 'ResponsiveManager',
     
     # Themes
     'default_theme', 'dark_theme', 'material_theme', 'fluent_theme',
