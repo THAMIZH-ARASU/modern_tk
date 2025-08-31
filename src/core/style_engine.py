@@ -5,11 +5,12 @@ Handles style parsing, validation, and application to widgets.
 
 import tkinter as tk
 from typing import Dict, Any, Optional, Union
-from ..utils.colors import Color
-from ..utils.validators import StyleValidator
-from ..effects.shadows import ShadowEffect
-from ..effects.borders import BorderEffect
-from ..effects.gradients import GradientEffect
+
+from src.effects.shadows import ShadowEffect
+from src.effects.borders import BorderEffect
+from src.effects.gradients import GradientEffect
+from src.utils.validators import StyleValidator
+
 
 class StyleEngine:
     """Central style processing and application engine"""

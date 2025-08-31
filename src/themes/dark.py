@@ -27,4 +27,6 @@ dark_theme = {
         "heading": ("Segoe UI", 12, "bold"),
         "monospace": ("Consolas", 9, "normal"),
         "small": ("Segoe UI", 8, "normal"),
-        "large": ("Segoe UI", 
+        "large": ("Segoe UI", 11, "normal")
+    }
+}

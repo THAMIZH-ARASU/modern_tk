@@ -4,7 +4,8 @@ Enhanced Frame widget with styling support.
 
 import tkinter as tk
 from typing import Dict, Any
-from ..core.base_widget import BaseWidget
+
+from src.core.base_widget import BaseWidget
 
 class Frame(BaseWidget):
     """Enhanced Frame with modern styling"""

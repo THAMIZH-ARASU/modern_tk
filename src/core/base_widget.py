@@ -6,8 +6,10 @@ Provides common styling and event handling functionality.
 import tkinter as tk
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional, Callable
-from .style_engine import StyleEngine
-from .event_manager import EventManager
+
+from src.core.event_manager import EventManager
+from src.core.style_engine import StyleEngine
+
 
 class BaseWidget(ABC):
     """Abstract base class for all Modern TK widgets"""
