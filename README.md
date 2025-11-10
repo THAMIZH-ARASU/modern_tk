@@ -6,6 +6,9 @@
 
 Modern TK is a Python library that brings modern, CSS-inspired styling to traditional Tkinter applications. It provides a declarative approach to UI design with support for themes, effects, and responsive layouts.
 
+---
+> Status: This project development is currently inactive. Interfaces, schemas, and docs may change frequently until the initial stable release. Hoping for someone to contribute to make this project a better library for UI development.
+
 ![Modern TK Dashboard Example](docs/images/theme_showcase.png)
 *Modern dashboard built with Modern TK*
 
